@@ -6,6 +6,7 @@ import datetime
 
 
 app=Flask(__name__)
+#For connecting to firebase storage
 firebaseConfig ={ 
   'apiKey': "AIzaSyDgaOfDfTjaOW0LroxJN1zT53DkovlPrSQ",
   'authDomain': "intern-baf81.firebaseapp.com",
@@ -21,6 +22,8 @@ firebaseConfig ={
 
 firebase=pyrebase.initialize_app(firebaseConfig)
 storage=firebase.storage()
+
+#for connection to Xampp mysql
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = 'pwdpwd'
@@ -30,31 +33,22 @@ app.config['MYSQL_DB'] = 'dezzex'
 mysql = MySQL(app)
 
 
-
-def check_connection():
-    cur=mysql.connection.cursor()
-    if cur:
-        return cur
-    return -1
-
 app.secret_key=os.urandom(24)
 
-
+#Generating url for Index page 
 @app.route('/')
 def blank():
     return redirect(url_for('index'))
 
-
+#Displaying the index page
 @app.route('/index')
 def index():
     return render_template('index.html')
 
 
+#Taking the user data and storing it it the database
 @app.route('/register',methods=['POST'])
 def register():
-    '''cur=check_connection()
-    if cur==-1:
-        return ("Connection failed")'''
     if request.method =="POST":
         f_name = request.form['Full_name']
         email = request.form['Email']
@@ -72,20 +66,20 @@ def register():
 
     
 
-
+#If the user sucessfully registers it shows this page.
 @app.route('/sucess')
 def sucess():
     return render_template('sucess.html')
 
 
 
-
+#Displaying the login page
 @app.route('/login')
 def login():
     return render_template('login.html',error="")
 
 
-
+#Validating the user
 @app.route('/validate',methods=['POST'])
 def validate():
     if request.method == "POST":
@@ -103,7 +97,7 @@ def validate():
 
 
 
-
+#Displaying the users Dashboard
 @app.route('/dashboard/<username>')
 def dashboard(username):
     if g.user:
@@ -124,7 +118,7 @@ def before_request():
         g.user=session['user']
 
 
-
+#Dropsession of the user
 @app.route('/dropsession')
 def dropsession():
     session.pop('user',None)
